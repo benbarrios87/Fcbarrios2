@@ -63,6 +63,52 @@ export async function initializeAuth() {
   });
 }
 
+
+export async function completeAuthCallback() {
+  if (!supabase) {
+    throw new Error("Supabase er ikke koblet til.");
+  }
+
+  const url = new URL(window.location.href);
+  const code = url.searchParams.get("code");
+  const errorDescription =
+    url.searchParams.get("error_description") ||
+    url.searchParams.get("error");
+
+  if (errorDescription) {
+    throw new Error(decodeURIComponent(errorDescription));
+  }
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      throw new Error(`Kunne ikke fullføre innloggingen: ${error.message}`);
+    }
+  }
+
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+      throw new Error(`Kunne ikke lese innloggingen: ${error.message}`);
+    }
+
+    if (data.session) {
+      currentSession = data.session;
+      await loadIdentity();
+      notify();
+      return data.session;
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, 150));
+  }
+
+  throw new Error(
+    "Innloggingslenken ble åpnet, men ingen session ble opprettet."
+  );
+}
+
 export function subscribeToAuth(listener) {
   listeners.add(listener);
   listener(getAuthSnapshot());
