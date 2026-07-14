@@ -5,9 +5,11 @@ import { ProfilePage } from "../pages/profile/profile-page.js";
 import { StatsPage } from "../pages/stats/stats-page.js";
 import { AdminPage } from "../pages/admin/admin-page.js";
 import { HistoryPage } from "../pages/history/history-page.js";
+import { LoginPage } from "../pages/login/login-page.js";
 
 export const routes = {
   "/": HomePage,
+  "/login": LoginPage,
   "/tips": TipsPage,
   "/leaderboard": LeaderboardPage,
   "/profile": ProfilePage,

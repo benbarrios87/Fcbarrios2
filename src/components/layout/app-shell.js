@@ -12,7 +12,11 @@ export function AppShell() {
             <small>Prediction League</small>
           </span>
         </a>
-        <span class="topbar__status"><i></i> EM 2028</span>
+
+        <div class="topbar__right">
+          <span class="topbar__status"><i></i> EM 2028</span>
+          <div id="auth-control" class="auth-control"></div>
+        </div>
       </header>
 
       <main id="page-outlet" class="page-outlet"></main>

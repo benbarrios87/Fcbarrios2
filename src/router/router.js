@@ -7,10 +7,17 @@ function normalizePath(pathname) {
   return cleaned || "/";
 }
 
-function navigate(path) {
-  if (window.location.pathname !== path) {
-    window.history.pushState({}, "", path);
+function navigate(destination) {
+  const url = new URL(destination, window.location.origin);
+  const nextLocation = `${url.pathname}${url.search}${url.hash}`;
+
+  if (
+    `${window.location.pathname}${window.location.search}${window.location.hash}` !==
+    nextLocation
+  ) {
+    window.history.pushState({}, "", nextLocation);
   }
+
   void renderCurrentRoute();
 }
 
@@ -50,7 +57,7 @@ function bindNavigation() {
     if (url.origin !== window.location.origin) return;
 
     event.preventDefault();
-    navigate(url.pathname);
+    navigate(`${url.pathname}${url.search}${url.hash}`);
   });
 
   window.addEventListener("popstate", renderCurrentRoute);
@@ -61,5 +68,6 @@ export const router = {
     bindNavigation();
     await renderCurrentRoute();
   },
-  navigate
+  navigate,
+  refresh: renderCurrentRoute
 };
