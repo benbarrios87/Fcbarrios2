@@ -5,6 +5,7 @@ import {
   mockNews,
   mockCommunity
 } from "../data/mock-data.js";
+import { getCommunityPredictions } from "./community-repository.js";
 
 async function getRealParticipantCount(tournamentId) {
   const { count, error } = await supabase
@@ -43,9 +44,7 @@ async function getRealMatchCounts(tournamentId) {
 async function getMyPredictions(tournamentId) {
   const { data: sessionData } = await supabase.auth.getSession();
 
-  if (!sessionData.session) {
-    return [];
-  }
+  if (!sessionData.session) return [];
 
   const { data, error } = await supabase.rpc("get_my_predictions", {
     target_tournament_id: tournamentId
@@ -81,7 +80,11 @@ export async function getHomeData(tournamentId) {
       leaderboard: mockLeaderboard,
       matches: mockMatches,
       news: mockNews,
-      community: mockCommunity,
+      community: mockCommunity.map((item) => ({
+        ...item,
+        is_visible: true,
+        total_count: 12
+      })),
       participantCount: 64,
       matchCounts: {
         total: mockMatches.length,
@@ -96,7 +99,8 @@ export async function getHomeData(tournamentId) {
     newsResult,
     participantCount,
     matchCounts,
-    predictions
+    predictions,
+    community
   ] = await Promise.all([
     supabase
       .from("leaderboard_view")
@@ -136,7 +140,8 @@ export async function getHomeData(tournamentId) {
 
     getRealParticipantCount(tournamentId),
     getRealMatchCounts(tournamentId),
-    getMyPredictions(tournamentId)
+    getMyPredictions(tournamentId),
+    getCommunityPredictions(tournamentId, 4)
   ]);
 
   const error =
@@ -162,7 +167,7 @@ export async function getHomeData(tournamentId) {
       body: item.body,
       type: item.category || "stat"
     })),
-    community: [],
+    community,
     participantCount,
     matchCounts
   };
