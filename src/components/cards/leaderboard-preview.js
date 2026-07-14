@@ -15,24 +15,45 @@ export function LeaderboardPreview(players) {
         title: "Topp 5 akkurat nå",
         action: `<a href="/leaderboard" data-link class="text-link">Hele tabellen →</a>`
       })}
-      <div class="leaderboard-list">
-        ${players
-          .map(
-            (player) => `
-              <a class="leaderboard-row" href="/profile?id=${player.id}" data-link>
-                <span class="leaderboard-row__rank">${player.rank}</span>
-                <span class="avatar">${initials(player.name)}</span>
-                <span class="leaderboard-row__name">
-                  <strong>${player.name}</strong>
-                  <small>${player.exact_hits} fulltreffere</small>
-                </span>
-                ${movement(player.movement)}
-                <strong class="leaderboard-row__points">${formatPoints(player.points)}</strong>
-              </a>
-            `
-          )
-          .join("")}
-      </div>
+
+      ${
+        players.length
+          ? `
+            <div class="leaderboard-list">
+              ${players
+                .map(
+                  (player) => `
+                    <a
+                      class="leaderboard-row"
+                      href="/profile?id=${player.id}"
+                      data-link
+                    >
+                      <span class="leaderboard-row__rank">${player.rank}</span>
+                      <span class="avatar">${initials(player.name)}</span>
+
+                      <span class="leaderboard-row__name">
+                        <strong>${player.name}</strong>
+                        <small>${player.exact_hits} fulltreffere</small>
+                      </span>
+
+                      ${movement(player.movement)}
+                      <strong class="leaderboard-row__points">
+                        ${formatPoints(player.points)}
+                      </strong>
+                    </a>
+                  `
+                )
+                .join("")}
+            </div>
+          `
+          : `
+            <div class="home-empty-state">
+              <span>🏆</span>
+              <strong>Topplisten venter</strong>
+              <small>Poeng vises her når kampene er scoret.</small>
+            </div>
+          `
+      }
     </section>
   `;
 }

@@ -3,6 +3,7 @@ import { getHomeData } from "../../repositories/home-repository.js";
 import { appConfig } from "../../config/app-config.js";
 import { HeroCard } from "../../components/cards/hero-card.js";
 import { StatusStrip } from "../../components/cards/status-strip.js";
+import { TournamentProgress } from "../../components/cards/tournament-progress.js";
 import { MatchCard } from "../../components/cards/match-card.js";
 import { LeaderboardPreview } from "../../components/cards/leaderboard-preview.js";
 import { NewsCard } from "../../components/cards/news-card.js";
@@ -16,14 +17,28 @@ export async function HomePage() {
 
   return `
     <div class="page">
-      ${appConfig.mockMode ? `
-        <div class="demo-banner">
-          DEMOMODUS · Koble til Supabase når du er klar
-        </div>
-      ` : ""}
+      ${
+        appConfig.mockMode
+          ? `
+            <div class="demo-banner">
+              DEMOMODUS · Koble til Supabase når du er klar
+            </div>
+          `
+          : ""
+      }
 
       ${HeroCard(tournament)}
-      ${StatusStrip(tournament)}
+
+      ${StatusStrip({
+        tournament,
+        participantCount: data.participantCount,
+        matchCounts: data.matchCounts
+      })}
+
+      ${TournamentProgress({
+        tournament,
+        matchCounts: data.matchCounts
+      })}
 
       <section class="home-grid">
         <div class="home-grid__main">
@@ -33,9 +48,22 @@ export async function HomePage() {
               title: "Dine neste tips",
               action: `<a href="/tips" data-link class="text-link">Alle kampene →</a>`
             })}
-            <div class="match-list">
-              ${data.matches.map(MatchCard).join("")}
-            </div>
+
+            ${
+              data.matches.length
+                ? `
+                  <div class="match-list">
+                    ${data.matches.map(MatchCard).join("")}
+                  </div>
+                `
+                : `
+                  <div class="home-empty-state">
+                    <span>⚽</span>
+                    <strong>Ingen kommende kamper</strong>
+                    <small>Nye kamper vises her når de blir lagt inn.</small>
+                  </div>
+                `
+            }
           </section>
 
           ${CommunityCard(data.community)}

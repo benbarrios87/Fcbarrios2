@@ -1,0 +1,92 @@
+.tournament-progress {
+  display: grid;
+  grid-template-columns: minmax(180px, auto) 1fr auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 16px 19px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(6, 15, 27, .82);
+  backdrop-filter: blur(14px);
+}
+
+.tournament-progress__copy {
+  display: grid;
+  gap: 3px;
+}
+
+.tournament-progress__copy span {
+  color: var(--green-light);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.tournament-progress__copy strong {
+  font-size: 12px;
+}
+
+.tournament-progress__bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+}
+
+.tournament-progress__bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), var(--green-light));
+  box-shadow: 0 0 18px rgba(41, 209, 125, .3);
+}
+
+.tournament-progress > b {
+  color: var(--gold-light);
+  font-size: 12px;
+}
+
+.home-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  padding: 25px;
+  border: 1px dashed var(--line);
+  border-radius: 17px;
+  text-align: center;
+}
+
+.home-empty-state > span {
+  margin-bottom: 8px;
+  font-size: 31px;
+}
+
+.home-empty-state strong {
+  font-size: 14px;
+}
+
+.home-empty-state small {
+  max-width: 280px;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.match-card__missing {
+  color: #ff9fa5 !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 620px) {
+  .tournament-progress {
+    grid-template-columns: 1fr auto;
+  }
+
+  .tournament-progress__bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

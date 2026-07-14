@@ -17,15 +17,35 @@ export function MatchCard(match) {
         <span>${match.round}</span>
         <time>${formatKickoff(match.kickoff_at)}</time>
       </div>
+
       <div class="match-card__teams">
-        <div>${Tier({ tier: match.home_tier })}<strong>${match.home_team}</strong></div>
+        <div>
+          ${Tier({ tier: match.home_tier })}
+          <strong>${match.home_team}</strong>
+        </div>
+
         <span>–</span>
-        <div><strong>${match.away_team}</strong>${Tier({ tier: match.away_tier })}</div>
+
+        <div>
+          <strong>${match.away_team}</strong>
+          ${Tier({ tier: match.away_tier })}
+        </div>
       </div>
+
       <div class="match-card__tip">
         <span>Ditt tips</span>
-        <strong>${hasTip ? `${match.user_home_tip} – ${match.user_away_tip}` : "Mangler"}</strong>
-        <small>${hasTip ? `Maks ${match.max_points} poeng` : "Legg inn før fristen"}</small>
+
+        ${
+          hasTip
+            ? `
+              <strong>${match.user_home_tip} – ${match.user_away_tip}</strong>
+              <small>✓ Lagret</small>
+            `
+            : `
+              <strong class="match-card__missing">Mangler</strong>
+              <a href="/tips" data-link class="text-link">Tipp nå →</a>
+            `
+        }
       </div>
     </article>
   `;
