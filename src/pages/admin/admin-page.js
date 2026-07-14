@@ -10,9 +10,7 @@ export async function AdminPage() {
           <span>🔒</span>
           <h1>Logg inn først</h1>
           <p>Adminområdet krever en FC Barrios-konto.</p>
-          <a class="button button--primary" href="/login" data-link>
-            Logg inn
-          </a>
+          <a class="button button--primary" href="/login" data-link>Logg inn</a>
         </section>
       </div>
     `;
@@ -25,9 +23,7 @@ export async function AdminPage() {
           <span>⛔</span>
           <h1>Ingen admin-tilgang</h1>
           <p>Kontoen din er logget inn som spiller.</p>
-          <a class="button button--ghost" href="/" data-link>
-            Til forsiden
-          </a>
+          <a class="button button--ghost" href="/" data-link>Til forsiden</a>
         </section>
       </div>
     `;
@@ -37,8 +33,8 @@ export async function AdminPage() {
     ["📣", "Nyheter", "Publiser meldinger og siste nytt.", "#"],
     ["🔓", "Runder", "Åpne og lås tipperunder.", "#"],
     ["⚽", "Kamper og resultater", "Registrer resultater og beregn poeng.", "/admin/results"],
-    ["🧮", "Scoremodell", "Endre poengmatrisen uten kode.", "/admin/scoring"],
-    ["🧨", "Road to Glory", "Lag, multiplikatorer og status.", "#"],
+    ["🧮", "Scoremodell", "Endre kampmatrisen uten kode.", "/admin/scoring"],
+    ["🎯", "Bonusmotor", "Toppscorer, Best Player, RTG og bonusvalg.", "/admin/bonuses"],
     ["👥", "Spillere", "Deltakere, roller og tilgang.", "#"]
   ];
 
