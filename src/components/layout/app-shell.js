@@ -3,10 +3,16 @@ import { Navigation } from "./navigation.js";
 export function AppShell() {
   return `
     <div class="pitch-lines" aria-hidden="true"></div>
+
     <div class="app-shell">
       <header class="topbar">
         <a class="brand" href="/" data-link aria-label="FC Barrios hjem">
-          <span class="brand__crest">FCB</span>
+          <img
+            class="brand__logo"
+            src="/fcbarrios-logo.png"
+            alt="FC Barrios"
+          />
+
           <span class="brand__copy">
             <strong>FC BARRIOS</strong>
             <small>Prediction League</small>
