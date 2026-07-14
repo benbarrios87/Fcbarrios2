@@ -53,10 +53,9 @@ export async function initializeAuth() {
   await loadIdentity();
   notify();
 
-  supabase.auth.onAuthStateChange(async (_event, session) => {
+  supabase.auth.onAuthStateChange((_event, session) => {
     currentSession = session;
 
-    // Avoid doing database work synchronously inside the auth callback.
     window.setTimeout(async () => {
       await loadIdentity();
       notify();
@@ -64,10 +63,56 @@ export async function initializeAuth() {
   });
 }
 
+export async function completeAuthCallback() {
+  if (!supabase) {
+    throw new Error("Supabase er ikke koblet til.");
+  }
+
+  const url = new URL(window.location.href);
+  const code = url.searchParams.get("code");
+  const errorDescription =
+    url.searchParams.get("error_description") ||
+    url.searchParams.get("error");
+
+  if (errorDescription) {
+    throw new Error(decodeURIComponent(errorDescription));
+  }
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      throw new Error(`Kunne ikke fullføre innloggingen: ${error.message}`);
+    }
+  }
+
+  // Implicit magic links are normally detected automatically by the client.
+  // Give the client a brief opportunity to persist the session.
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+      throw new Error(`Kunne ikke lese innloggingen: ${error.message}`);
+    }
+
+    if (data.session) {
+      currentSession = data.session;
+      await loadIdentity();
+      notify();
+      return data.session;
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, 150));
+  }
+
+  throw new Error(
+    "Innloggingslenken ble åpnet, men ingen session ble opprettet. Be om en ny lenke."
+  );
+}
+
 export function subscribeToAuth(listener) {
   listeners.add(listener);
   listener(getAuthSnapshot());
-
   return () => listeners.delete(listener);
 }
 
@@ -97,7 +142,7 @@ export async function sendMagicLink(email, displayName = "") {
   const { error } = await supabase.auth.signInWithOtp({
     email: cleanEmail,
     options: {
-      emailRedirectTo: `${window.location.origin}/profile`,
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
       data: {
         display_name: String(displayName || "").trim()
       }
