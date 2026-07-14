@@ -11,11 +11,13 @@ import { ScoreModelPage } from "../pages/admin/score-model-page.js";
 import { BonusSettingsPage } from "../pages/admin/bonus-settings-page.js";
 import { HistoryPage } from "../pages/history/history-page.js";
 import { LoginPage } from "../pages/login/login-page.js";
+import { ResetPasswordPage } from "../pages/login/reset-password-page.js";
 import { AuthCallbackPage } from "../pages/auth-callback/auth-callback-page.js";
 
 export const routes = {
   "/": HomePage,
   "/login": LoginPage,
+  "/reset-password": ResetPasswordPage,
   "/auth/callback": AuthCallbackPage,
   "/tips": TipsPage,
   "/bonuses": BonusPage,
