@@ -72,6 +72,7 @@ function normalizeProfile(data) {
   return {
     id: data.player_id,
     name: data.name,
+    avatarUrl: data.avatar_url || "",
     overall: calculateOverall(data),
     rank: current.rank,
     points: Number(current.points || 0),

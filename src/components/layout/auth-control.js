@@ -4,11 +4,7 @@ import {
 } from "../../services/auth-service.js";
 
 function signedOutTemplate() {
-  return `
-    <a class="auth-control__login" href="/login" data-link>
-      Logg inn
-    </a>
-  `;
+  return `<a class="auth-control__login" href="/login" data-link>Logg inn</a>`;
 }
 
 function signedInTemplate(snapshot) {
@@ -17,16 +13,19 @@ function signedInTemplate(snapshot) {
     snapshot.user?.email?.split("@")[0] ||
     "Min konto";
 
+  const avatar = snapshot.player?.avatar_url
+    ? `<img class="auth-control__avatar auth-control__avatar--image" src="${snapshot.player.avatar_url}" alt="" />`
+    : `<span class="auth-control__avatar">${name.slice(0, 1).toUpperCase()}</span>`;
+
   return `
     <div class="auth-control__user">
       <a href="/profile" data-link>
-        <span class="auth-control__avatar">${name.slice(0, 1).toUpperCase()}</span>
+        ${avatar}
         <span class="auth-control__name">
           <strong>${name}</strong>
           <small>${snapshot.membership?.role || "spiller"}</small>
         </span>
       </a>
-
       <button type="button" data-sign-out aria-label="Logg ut">↗</button>
     </div>
   `;

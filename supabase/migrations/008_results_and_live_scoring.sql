@@ -60,6 +60,7 @@ $$;
 grant execute on function public.set_match_result(uuid, integer, integer, boolean)
 to authenticated;
 
+drop view if exists public.leaderboard_view;
 create or replace view public.leaderboard_view as
 select
   tm.tournament_id,

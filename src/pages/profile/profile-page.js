@@ -9,22 +9,26 @@ function stat(label, value) {
       ? "–"
       : value;
 
-  return `
-    <div>
-      <strong>${displayValue}</strong>
-      <span>${label}</span>
-    </div>
-  `;
+  return `<div><strong>${displayValue}</strong><span>${label}</span></div>`;
+}
+
+function playerVisual(player, className) {
+  if (player.avatarUrl) {
+    return `
+      <img
+        class="${className}"
+        src="${player.avatarUrl}"
+        alt="${player.name}"
+      />
+    `;
+  }
+
+  return `<span class="${className} profile-initials">${initials(player.name)}</span>`;
 }
 
 function CareerTimeline(history) {
   if (!history.length) {
-    return `
-      <div class="profile-empty">
-        <span>📚</span>
-        <strong>Ingen tidligere mesterskap ennå</strong>
-      </div>
-    `;
+    return `<div class="profile-empty"><span>📚</span><strong>Ingen tidligere mesterskap ennå</strong></div>`;
   }
 
   return `
@@ -35,7 +39,6 @@ function CareerTimeline(history) {
             <span>${item.year}</span>
             ${item.isChampion ? "<b>🏆</b>" : ""}
           </div>
-
           <div class="career-timeline__main">
             <strong>${item.tournament}</strong>
             <small>
@@ -47,7 +50,6 @@ function CareerTimeline(history) {
               }
             </small>
           </div>
-
           <div class="career-timeline__rank">
             <strong>#${item.rank}</strong>
             <small>av ${item.fieldSize}</small>
@@ -64,10 +66,7 @@ function Achievements(items) {
       ${items.map((item) => `
         <article>
           <span>${item.icon}</span>
-          <div>
-            <strong>${item.name}</strong>
-            <small>${item.description}</small>
-          </div>
+          <div><strong>${item.name}</strong><small>${item.description}</small></div>
         </article>
       `).join("")}
     </div>
@@ -78,10 +77,7 @@ export async function ProfilePage() {
   const auth = getAuthSnapshot();
   const tournament = await getActiveTournament();
   const requestedPlayerId = new URLSearchParams(window.location.search).get("id");
-  const playerId =
-    requestedPlayerId ||
-    auth.player?.player_id ||
-    auth.player?.id;
+  const playerId = requestedPlayerId || auth.player?.player_id || auth.player?.id;
 
   if (!playerId) {
     return `
@@ -90,21 +86,20 @@ export async function ProfilePage() {
           <span>👤</span>
           <h1>Velg en spiller</h1>
           <p>Åpne en spiller fra leaderboardet eller logg inn for å se din profil.</p>
-          <a class="button button--primary" href="/leaderboard" data-link>
-            Se leaderboard
-          </a>
+          <a class="button button--primary" href="/leaderboard" data-link>Se leaderboard</a>
         </section>
       </div>
     `;
   }
 
   const player = await getProfile(playerId, tournament.id);
+  const isOwnProfile = auth.player?.player_id === player.id || auth.player?.id === player.id;
 
   return `
     <div class="page profile-page">
       <header class="profile-hero">
         <div class="profile-hero__logo">
-          <img src="/fcbarrios-logo.png" alt="FC Barrios-logo" />
+          ${playerVisual(player, "profile-hero__photo")}
         </div>
 
         <div class="profile-hero__copy">
@@ -115,17 +110,18 @@ export async function ProfilePage() {
             ${player.titles} titler ·
             ${player.podiums} pallplasser
           </p>
+
+          ${
+            isOwnProfile
+              ? `<a class="button button--ghost profile-edit-link" href="/profile/edit" data-link>Endre profilbilde</a>`
+              : ""
+          }
         </div>
       </header>
 
       <section class="profile-layout">
         <article class="fut-card fut-card--career">
-          <img
-            class="fut-card__brand"
-            src="/fcbarrios-logo.png"
-            alt=""
-            aria-hidden="true"
-          />
+          <img class="fut-card__brand" src="/fcbarrios-logo.png" alt="" aria-hidden="true" />
 
           <div class="fut-card__rating">
             <strong>${player.overall}</strong>
@@ -133,7 +129,7 @@ export async function ProfilePage() {
           </div>
 
           <div class="fut-card__avatar">
-            ${initials(player.name)}
+            ${playerVisual(player, "fut-card__photo")}
           </div>
 
           <h2>${player.name}</h2>
@@ -158,22 +154,12 @@ export async function ProfilePage() {
           </section>
 
           <section class="panel">
-            <div class="section-heading">
-              <div>
-                <span>Samling</span>
-                <h2>Achievements</h2>
-              </div>
-            </div>
+            <div class="section-heading"><div><span>Samling</span><h2>Achievements</h2></div></div>
             ${Achievements(player.achievements)}
           </section>
 
           <section class="panel">
-            <div class="section-heading">
-              <div>
-                <span>Siden 2016</span>
-                <h2>Karriere</h2>
-              </div>
-            </div>
+            <div class="section-heading"><div><span>Siden 2016</span><h2>Karriere</h2></div></div>
             ${CareerTimeline(player.history)}
           </section>
         </div>
