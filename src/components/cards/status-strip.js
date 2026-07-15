@@ -1,24 +1,28 @@
-export function StatusStrip({ tournament, participantCount, matchCounts }) {
+export function StatusStrip({ participantCount, paidCount, totalPrizePool, matchCounts }) {
   const totalMatches = matchCounts?.total ?? 0;
   const finishedMatches = matchCounts?.finished ?? 0;
+  const remainingMatches = Math.max(totalMatches - finishedMatches, 0);
 
   return `
-    <section class="status-strip">
+    <section class="status-strip status-strip--four">
       <article>
-        <span>Deltakere</span>
+        <span>Spillere</span>
         <strong>${participantCount ?? 0}</strong>
       </article>
 
       <article>
-        <span>Premiepool</span>
-        <strong>
-          ${Number(tournament.prize_pool || 0).toLocaleString("no-NO")} kr
-        </strong>
+        <span>Betalt</span>
+        <strong>${paidCount ?? 0}</strong>
       </article>
 
       <article>
-        <span>Kamper</span>
-        <strong>${finishedMatches} / ${totalMatches}</strong>
+        <span>Premiepott</span>
+        <strong>${Number(totalPrizePool || 0).toLocaleString("no-NO")} kr</strong>
+      </article>
+
+      <article>
+        <span>Kamper igjen</span>
+        <strong>${remainingMatches}</strong>
       </article>
     </section>
   `;
