@@ -1,7 +1,4 @@
-import {
-  subscribeToAuth,
-  signOut
-} from "../../services/auth-service.js";
+import { subscribeToAuth, signOut } from "../../services/auth-service.js";
 
 function signedOutTemplate() {
   return `<a class="auth-control__login" href="/login" data-link>Logg inn</a>`;
@@ -17,18 +14,17 @@ function signedInTemplate(snapshot) {
     ? `<img class="auth-control__avatar auth-control__avatar--image" src="${snapshot.player.avatar_url}" alt="" />`
     : `<span class="auth-control__avatar">${name.slice(0, 1).toUpperCase()}</span>`;
 
-  return `
-    <div class="auth-control__user">
-      <a href="/profile" data-link>
-        ${avatar}
-        <span class="auth-control__name">
-          <strong>${name}</strong>
-          <small>${snapshot.membership?.role || "spiller"}</small>
-        </span>
-      </a>
-      <button type="button" data-sign-out aria-label="Logg ut">↗</button>
-    </div>
-  `;
+  return `<div class="auth-control__user">
+    ${snapshot.isAdmin ? `<a class="auth-control__admin" href="/admin" data-link aria-label="Admin">⚙</a>` : ""}
+    <a href="/profile" data-link>
+      ${avatar}
+      <span class="auth-control__name">
+        <strong>${name}</strong>
+        <small>${snapshot.membership?.role || "spiller"}</small>
+      </span>
+    </a>
+    <button type="button" data-sign-out aria-label="Logg ut">↗</button>
+  </div>`;
 }
 
 export function mountAuthControl() {
