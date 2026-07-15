@@ -1,45 +1,4 @@
-import { subscribeToAuth, signOut } from "../../services/auth-service.js";
-
-function signedOutTemplate() {
-  return `<a class="auth-control__login" href="/login" data-link>Logg inn</a>`;
-}
-
-function signedInTemplate(snapshot) {
-  const name =
-    snapshot.player?.display_name ||
-    snapshot.user?.email?.split("@")[0] ||
-    "Min konto";
-
-  const avatar = snapshot.player?.avatar_url
-    ? `<img class="auth-control__avatar auth-control__avatar--image" src="${snapshot.player.avatar_url}" alt="" />`
-    : `<span class="auth-control__avatar">${name.slice(0, 1).toUpperCase()}</span>`;
-
-  return `<div class="auth-control__user">
-    ${snapshot.isAdmin ? `<a class="auth-control__admin" href="/admin" data-link aria-label="Admin">⚙</a>` : ""}
-    <a href="/profile" data-link>
-      ${avatar}
-      <span class="auth-control__name">
-        <strong>${name}</strong>
-        <small>${snapshot.membership?.role || "spiller"}</small>
-      </span>
-    </a>
-    <button type="button" data-sign-out aria-label="Logg ut">↗</button>
-  </div>`;
-}
-
-export function mountAuthControl() {
-  const target = document.querySelector("#auth-control");
-  if (!target) return;
-
-  subscribeToAuth((snapshot) => {
-    target.innerHTML = snapshot.isAuthenticated
-      ? signedInTemplate(snapshot)
-      : signedOutTemplate();
-
-    target.querySelector("[data-sign-out]")?.addEventListener("click", async () => {
-      await signOut();
-      window.history.pushState({}, "", "/");
-      window.dispatchEvent(new PopStateEvent("popstate"));
-    });
-  });
-}
+import { subscribeToAuth,signOut } from "../../services/auth-service.js";
+function out(){return `<a class="auth-control__login" href="/login" data-link>Logg inn</a>`}
+function inn(s){const n=s.player?.display_name||s.user?.email?.split("@")[0]||"Min konto";const av=s.player?.avatar_url?`<img class="auth-control__avatar auth-control__avatar--image" src="${s.player.avatar_url}" alt=""/>`:`<span class="auth-control__avatar">${n.slice(0,1).toUpperCase()}</span>`;return `<div class="auth-control__user">${s.isAdmin?`<a class="auth-control__admin" href="/admin" data-link title="Admin">⚙ Admin</a>`:""}<a href="/profile" data-link>${av}<span class="auth-control__name"><strong>${n}</strong><small>${s.membership?.role||"spiller"}</small></span></a><button type="button" data-sign-out aria-label="Logg ut">↗</button></div>`}
+export function mountAuthControl(){const t=document.querySelector("#auth-control");if(!t)return;subscribeToAuth(s=>{t.innerHTML=s.isAuthenticated?inn(s):out();t.querySelector("[data-sign-out]")?.addEventListener("click",async()=>{await signOut();history.pushState({},"","/");dispatchEvent(new PopStateEvent("popstate"));});});}

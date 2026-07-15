@@ -1,0 +1,4 @@
+import { supabase } from "../services/supabase-client.js";
+export async function getAdminPaymentOverview(tournamentId){const{data,error}=await supabase.rpc("get_admin_payment_overview",{target_tournament_id:tournamentId});if(error)throw new Error(`Kunne ikke hente betalinger: ${error.message}`);return data??[];}
+export async function updateMemberPayment({tournamentId,playerId,buyInTier,paymentStatus,paidAmount,paymentNote}){const{error}=await supabase.rpc("update_member_payment",{target_tournament_id:tournamentId,target_player_id:playerId,target_buy_in_tier:buyInTier||null,target_payment_status:paymentStatus,target_paid_amount:Number(paidAmount||0),target_payment_note:paymentNote||null});if(error)throw new Error(error.message);}
+export async function getBuyInPools(tournamentId){const{data,error}=await supabase.rpc("get_buy_in_pools",{target_tournament_id:tournamentId});if(error)throw new Error(`Kunne ikke hente premiepottene: ${error.message}`);return data??[];}
