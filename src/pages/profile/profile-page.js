@@ -1,5 +1,5 @@
 import { getActiveTournament } from "../../repositories/tournament-repository.js";
-import { getProfile } from "../../repositories/profile-repository.js";
+import { getProfile, getPlayerPoolStatus } from "../../repositories/profile-repository.js";
 import { getAuthSnapshot } from "../../services/auth-service.js";
 import { formatPoints, initials } from "../../utils/format.js";
 
@@ -92,7 +92,10 @@ export async function ProfilePage() {
     `;
   }
 
-  const player = await getProfile(playerId, tournament.id);
+  const [player, poolStatus] = await Promise.all([
+    getProfile(playerId, tournament.id),
+    getPlayerPoolStatus(tournament.id, playerId)
+  ]);
   const isOwnProfile = auth.player?.player_id === player.id || auth.player?.id === player.id;
 
   return `
@@ -151,6 +154,23 @@ export async function ProfilePage() {
             ${stat("Snittplassering", player.averageFinish ?? "–")}
             ${stat("Riktige tips", player.totalCorrectPredictions)}
             ${stat("Mesterskap", player.tournamentsPlayed)}
+          </section>
+
+          <section class="panel profile-pool-card">
+            <div class="section-heading"><div><span>Premiepotter</span><h2>Du konkurrerer om</h2></div></div>
+            <div class="profile-pool-card__status">
+              <strong>${poolStatus.buy_in_tier ? `${poolStatus.buy_in_tier} kr` : "Ingen pulje valgt"}</strong>
+              <span class="${poolStatus.is_paid ? "is-paid" : ""}">
+                ${poolStatus.is_paid ? "✓ Betalt" : "⏳ Betaling mangler"}
+              </span>
+            </div>
+            <div class="profile-pool-list">
+              ${["bronze", "silver", "gold"].map((code) => {
+                const enabled = poolStatus.eligible_pools?.includes(code);
+                const labels = { bronze: "🥉 Bronsepotten", silver: "🥈 Sølvpotten", gold: "🥇 Gullpotten" };
+                return `<span class="${enabled ? "is-enabled" : ""}">${enabled ? "✓" : "–"} ${labels[code]}</span>`;
+              }).join("")}
+            </div>
           </section>
 
           <section class="panel">

@@ -116,3 +116,29 @@ export async function getProfile(playerId, _tournamentId) {
 
   return normalizeProfile(data);
 }
+
+
+export async function getPlayerPoolStatus(tournamentId, playerId) {
+  if (!hasSupabaseConfig || !playerId) {
+    return {
+      buy_in_tier: 800,
+      is_paid: true,
+      eligible_pools: ["bronze", "silver", "gold"]
+    };
+  }
+
+  const { data, error } = await supabase.rpc("get_player_pool_status", {
+    target_tournament_id: tournamentId,
+    target_player_id: playerId
+  });
+
+  if (error) {
+    throw new Error(`Kunne ikke hente premiepuljen: ${error.message}`);
+  }
+
+  return data ?? {
+    buy_in_tier: null,
+    is_paid: false,
+    eligible_pools: []
+  };
+}

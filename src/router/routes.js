@@ -11,6 +11,8 @@ import { ScoreModelPage } from "../pages/admin/score-model-page.js";
 import { BonusSettingsPage } from "../pages/admin/bonus-settings-page.js";
 import { PaymentsPage } from "../pages/admin/payments-page.js";
 import { PrizesPage } from "../pages/admin/prizes-page.js";
+import { TournamentPage } from "../pages/admin/tournament-page.js";
+import { TeamsPage } from "../pages/admin/teams-page.js";
 import { HistoryPage } from "../pages/history/history-page.js";
 import { LoginPage } from "../pages/login/login-page.js";
 import { ResetPasswordPage } from "../pages/login/reset-password-page.js";
@@ -33,5 +35,7 @@ export const routes={
   "/admin/scoring":ScoreModelPage,
   "/admin/bonuses":BonusSettingsPage,
   "/admin/payments":PaymentsPage,
-  "/admin/prizes":PrizesPage
+  "/admin/prizes":PrizesPage,
+  "/admin/tournament":TournamentPage,
+  "/admin/teams":TeamsPage
 };
