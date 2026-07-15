@@ -1,6 +1,12 @@
 import { formatPoints, initials } from "../../utils/format.js";
 import { SectionHeading } from "../ui/section-heading.js";
 
+const tierIcon = {
+  250: "🥉",
+  500: "🥈",
+  800: "🥇"
+};
+
 function movement(value) {
   if (value > 0) return `<span class="movement movement--up">↑${value}</span>`;
   if (value < 0) return `<span class="movement movement--down">↓${Math.abs(value)}</span>`;
@@ -11,6 +17,12 @@ function avatar(player) {
   return player.avatar_url
     ? `<img class="avatar avatar--image" src="${player.avatar_url}" alt="" />`
     : `<span class="avatar">${initials(player.name)}</span>`;
+}
+
+function playerMeta(player) {
+  const icon = tierIcon[Number(player.buy_in_tier)] || "";
+  const paid = player.is_paid ? " · ✓ Betalt" : "";
+  return `${icon ? `${icon} ` : ""}${player.exact_hits} fulltreffere${paid}`;
 }
 
 export function LeaderboardPreview(players) {
@@ -30,7 +42,7 @@ export function LeaderboardPreview(players) {
             ${avatar(player)}
             <span class="leaderboard-row__name">
               <strong>${player.name}</strong>
-              <small>${player.exact_hits} fulltreffere</small>
+              <small>${playerMeta(player)}</small>
             </span>
             ${movement(player.movement)}
             <strong class="leaderboard-row__points">${formatPoints(player.points)}</strong>
