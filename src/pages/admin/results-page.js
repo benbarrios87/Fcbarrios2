@@ -6,25 +6,44 @@ import {
 } from "../../repositories/results-repository.js";
 import { formatKickoff } from "../../utils/format.js";
 
-let pageState = {
+let state = {
   tournament: null,
   matches: [],
+  query: "",
   saving: new Set()
 };
 
-function resultValue(value) {
-  return value === null || value === undefined ? "" : value;
+function groupMatches(matches) {
+  return matches.reduce((groups, match) => {
+    const key = match.round || "Kamper";
+    groups[key] ??= [];
+    groups[key].push(match);
+    return groups;
+  }, {});
+}
+
+function filteredMatches() {
+  const query = state.query.trim().toLowerCase();
+
+  if (!query) return state.matches;
+
+  return state.matches.filter((match) =>
+    match.home_team.toLowerCase().includes(query) ||
+    match.away_team.toLowerCase().includes(query) ||
+    String(match.round || "").toLowerCase().includes(query)
+  );
 }
 
 function renderMatch(match) {
-  const saving = pageState.saving.has(match.match_id);
-  const scored = match.status === "finished";
+  const saving = state.saving.has(match.match_id);
+  const finished = match.status === "finished";
 
   return `
-    <article class="result-card" data-result-match="${match.match_id}">
+    <article class="result-card ${finished ? "result-card--finished" : ""}"
+      data-result-match="${match.match_id}">
       <div class="result-card__meta">
-        <span>${match.round || "Kamp"}</span>
         <time>${formatKickoff(match.kickoff_at)}</time>
+        <span>${finished ? "✓ Scoret" : "Venter"}</span>
       </div>
 
       <div class="result-card__main">
@@ -37,7 +56,7 @@ function renderMatch(match) {
             max="30"
             inputmode="numeric"
             data-result-home
-            value="${resultValue(match.home_score)}"
+            value="${match.home_score ?? ""}"
             aria-label="Mål ${match.home_team}"
           />
           <span>–</span>
@@ -47,7 +66,7 @@ function renderMatch(match) {
             max="30"
             inputmode="numeric"
             data-result-away
-            value="${resultValue(match.away_score)}"
+            value="${match.away_score ?? ""}"
             aria-label="Mål ${match.away_team}"
           />
         </div>
@@ -63,13 +82,7 @@ function renderMatch(match) {
 
       <div class="result-card__footer">
         <span class="result-status">
-          ${
-            saving
-              ? "Beregner poeng …"
-              : scored
-                ? "✓ Ferdig og scoret"
-                : "Ikke ferdigspilt"
-          }
+          ${saving ? "Beregner poeng …" : finished ? "Resultat kan oppdateres" : "Klar for resultat"}
         </span>
 
         <button
@@ -78,7 +91,7 @@ function renderMatch(match) {
           data-save-result
           ${saving ? "disabled" : ""}
         >
-          ${scored ? "Oppdater resultat" : "Lagre resultat"}
+          ${finished ? "Beregn på nytt" : "Lagre og beregn"}
         </button>
       </div>
     </article>
@@ -89,71 +102,108 @@ function renderContent() {
   const target = document.querySelector("#results-content");
   if (!target) return;
 
+  const matches = filteredMatches();
+  const groups = groupMatches(matches);
+  const finishedCount = state.matches.filter((m) => m.status === "finished").length;
+
   target.innerHTML = `
-    <div class="results-summary">
-      <span>
-        <strong>${pageState.matches.length}</strong>
-        kamper
-      </span>
-      <span>
-        <strong>
-          ${pageState.matches.filter((match) => match.status === "finished").length}
-        </strong>
-        ferdigspilt
-      </span>
+    <section class="results-toolbar panel">
+      <input
+        id="result-search"
+        type="search"
+        value="${state.query}"
+        placeholder="Søk etter lag eller runde"
+      />
+
+      <div>
+        <strong>${finishedCount}/${state.matches.length}</strong>
+        <span>ferdigspilt</span>
+      </div>
+    </section>
+
+    <div class="results-groups">
+      ${Object.entries(groups).map(([round, roundMatches]) => `
+        <section class="results-group">
+          <header>
+            <span>Runde</span>
+            <h2>${round}</h2>
+          </header>
+
+          <div class="results-list">
+            ${roundMatches.map(renderMatch).join("")}
+          </div>
+        </section>
+      `).join("")}
     </div>
 
-    <div class="results-list">
-      ${pageState.matches.map(renderMatch).join("")}
-    </div>
+    ${matches.length ? "" : `
+      <div class="tips-empty">Ingen kamper matcher søket.</div>
+    `}
   `;
 
   bindEvents();
 }
 
-function setCardMessage(matchId, message, isError = false) {
-  const card = document.querySelector(`[data-result-match="${matchId}"]`);
-  const status = card?.querySelector(".result-status");
+function setCardMessage(matchId, text, error = false) {
+  const status = document
+    .querySelector(`[data-result-match="${matchId}"]`)
+    ?.querySelector(".result-status");
 
   if (!status) return;
 
-  status.textContent = message;
-  status.classList.toggle("is-error", isError);
+  status.textContent = text;
+  status.classList.toggle("is-error", error);
 }
 
 function bindEvents() {
+  const search = document.querySelector("#result-search");
+
+  search?.addEventListener("input", () => {
+    state.query = search.value;
+    renderContent();
+
+    requestAnimationFrame(() => {
+      const nextSearch = document.querySelector("#result-search");
+      nextSearch?.focus();
+      nextSearch?.setSelectionRange(
+        nextSearch.value.length,
+        nextSearch.value.length
+      );
+    });
+  });
+
   document.querySelectorAll("[data-save-result]").forEach((button) => {
     button.addEventListener("click", async () => {
       const card = button.closest("[data-result-match]");
       const matchId = card.dataset.resultMatch;
-      const homeInput = card.querySelector("[data-result-home]");
-      const awayInput = card.querySelector("[data-result-away]");
+      const home = card.querySelector("[data-result-home]").value;
+      const away = card.querySelector("[data-result-away]").value;
 
-      if (homeInput.value === "" || awayInput.value === "") {
+      if (home === "" || away === "") {
         setCardMessage(matchId, "Fyll inn begge resultater.", true);
         return;
       }
 
-      pageState.saving.add(matchId);
+      state.saving.add(matchId);
       renderContent();
 
       try {
         const scoredCount = await saveMatchResult({
           matchId,
-          homeScore: homeInput.value,
-          awayScore: awayInput.value,
+          homeScore: home,
+          awayScore: away,
           finished: true
         });
 
-        pageState.matches = await getAdminMatches(pageState.tournament.id);
-        pageState.saving.delete(matchId);
+        state.matches = await getAdminMatches(state.tournament.id);
+        state.saving.delete(matchId);
         renderContent();
         setCardMessage(
           matchId,
-          `✓ Resultat lagret · ${scoredCount ?? 0} tips scoret`
+          `✓ Resultat lagret · ${scoredCount ?? 0} tips beregnet`
         );
       } catch (error) {
-        pageState.saving.delete(matchId);
+        state.saving.delete(matchId);
         renderContent();
         setCardMessage(matchId, error.message, true);
       }
@@ -180,9 +230,10 @@ export async function ResultsPage() {
   const tournament = await getActiveTournament();
   const matches = await getAdminMatches(tournament.id);
 
-  pageState = {
+  state = {
     tournament,
     matches,
+    query: "",
     saving: new Set()
   };
 
@@ -192,18 +243,13 @@ export async function ResultsPage() {
     <div class="page">
       <header class="page-header">
         <span>Admin · ${tournament.short_name}</span>
-        <h1>Resultater</h1>
+        <h1>Resultatsenter</h1>
         <p>
-          Registrer sluttresultatet. Alle tips beregnes automatisk på nytt.
+          Legg inn sluttresultatet. Tips og leaderboard beregnes automatisk.
         </p>
       </header>
 
-      <section id="results-content">
-        <div class="loading-state">
-          <div class="loading-ball">⚽</div>
-          <p>Laster kampene …</p>
-        </div>
-      </section>
+      <section id="results-content"></section>
     </div>
   `;
 }

@@ -2,7 +2,6 @@ import {
   getAuthSnapshot,
   signInWithPassword,
   signUpWithPassword,
-  sendMagicLink,
   requestPasswordReset
 } from "../../services/auth-service.js";
 
@@ -31,23 +30,20 @@ export async function LoginPage() {
 
   return `
     <div class="page auth-page">
-      <section class="auth-card auth-card--password">
-        <span class="eyebrow"><i></i> FC Barrios-konto</span>
+      <section class="auth-card auth-card--simple">
+        <img
+          class="auth-card__logo"
+          src="/fcbarrios-logo.png"
+          alt="FC Barrios"
+        />
+
+        <span class="eyebrow"><i></i> FC Barrios</span>
         <h1 id="auth-title">Logg inn</h1>
         <p id="auth-description">
-          Bruk e-post og passord. E-postlenke er fortsatt tilgjengelig som reserve.
+          Bruk e-post og passord.
         </p>
 
-        <div class="auth-tabs">
-          <button type="button" class="is-active" data-auth-mode="login">
-            Logg inn
-          </button>
-          <button type="button" data-auth-mode="signup">
-            Opprett konto
-          </button>
-        </div>
-
-        <form id="password-auth-form" class="auth-form">
+        <form id="auth-form" class="auth-form">
           <label id="display-name-field" hidden>
             <span>Navn</span>
             <input
@@ -69,7 +65,7 @@ export async function LoginPage() {
             />
           </label>
 
-          <label id="password-field">
+          <label>
             <span>Passord</span>
             <input
               name="password"
@@ -85,128 +81,64 @@ export async function LoginPage() {
             Logg inn
           </button>
 
-          <button
-            class="auth-text-button"
-            id="forgot-password"
-            type="button"
-          >
-            Glemt passord?
-          </button>
-
-          <div id="login-message" class="auth-message" aria-live="polite"></div>
+          <div id="auth-message" class="auth-message" aria-live="polite"></div>
         </form>
 
-        <div class="auth-divider"><span>eller</span></div>
+        <div class="auth-simple-links">
+          <button type="button" id="toggle-auth-mode">
+            Ny spiller? Opprett konto
+          </button>
 
-        <button
-          class="button button--ghost button--full"
-          id="magic-link-button"
-          type="button"
-        >
-          Send innloggingslenke på e-post
-        </button>
+          <button type="button" id="forgot-password">
+            Glemt passord?
+          </button>
+        </div>
       </section>
     </div>
   `;
 }
 
 function setMessage(text, type = "") {
-  const message = document.querySelector("#login-message");
-  if (!message) return;
+  const target = document.querySelector("#auth-message");
+  if (!target) return;
 
-  message.className = `auth-message ${type ? `auth-message--${type}` : ""}`;
-  message.textContent = text;
+  target.className = `auth-message ${type ? `auth-message--${type}` : ""}`;
+  target.textContent = text;
 }
 
-function setMode(nextMode) {
-  mode = nextMode;
-
+function updateMode() {
+  const isSignup = mode === "signup";
   const title = document.querySelector("#auth-title");
   const description = document.querySelector("#auth-description");
   const nameField = document.querySelector("#display-name-field");
   const passwordInput = document.querySelector('[name="password"]');
-  const submitButton = document.querySelector('#password-auth-form button[type="submit"]');
+  const submitButton = document.querySelector('#auth-form button[type="submit"]');
+  const toggleButton = document.querySelector("#toggle-auth-mode");
   const forgotButton = document.querySelector("#forgot-password");
 
-  document.querySelectorAll("[data-auth-mode]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.authMode === mode);
-  });
+  title.textContent = isSignup ? "Opprett konto" : "Logg inn";
+  description.textContent = isSignup
+    ? "Skriv navn, e-post og passord."
+    : "Bruk e-post og passord.";
 
-  if (mode === "signup") {
-    title.textContent = "Opprett konto";
-    description.textContent =
-      "Lag konto med navn, e-post og passord.";
-    nameField.hidden = false;
-    passwordInput.autocomplete = "new-password";
-    submitButton.textContent = "Opprett konto";
-    forgotButton.hidden = true;
-  } else {
-    title.textContent = "Logg inn";
-    description.textContent =
-      "Bruk e-post og passord. E-postlenke er fortsatt tilgjengelig som reserve.";
-    nameField.hidden = true;
-    passwordInput.autocomplete = "current-password";
-    submitButton.textContent = "Logg inn";
-    forgotButton.hidden = false;
-  }
-
+  nameField.hidden = !isSignup;
+  passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
+  submitButton.textContent = isSignup ? "Opprett konto" : "Logg inn";
+  toggleButton.textContent = isSignup
+    ? "Har du konto? Logg inn"
+    : "Ny spiller? Opprett konto";
+  forgotButton.hidden = isSignup;
   setMessage("");
 }
 
 function bindLoginPage() {
-  const form = document.querySelector("#password-auth-form");
-  const magicButton = document.querySelector("#magic-link-button");
+  const form = document.querySelector("#auth-form");
+  const toggleButton = document.querySelector("#toggle-auth-mode");
   const forgotButton = document.querySelector("#forgot-password");
 
-  document.querySelectorAll("[data-auth-mode]").forEach((button) => {
-    button.addEventListener("click", () => setMode(button.dataset.authMode));
-  });
-
-  form?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const submitButton = form.querySelector('button[type="submit"]');
-    const formData = new FormData(form);
-
-    submitButton.disabled = true;
-    submitButton.textContent = mode === "signup" ? "Oppretter …" : "Logger inn …";
-    setMessage("");
-
-    try {
-      if (mode === "signup") {
-        const result = await signUpWithPassword(
-          formData.get("email"),
-          formData.get("password"),
-          formData.get("displayName")
-        );
-
-        if (result.session) {
-          window.history.replaceState({}, "", "/tips");
-          window.dispatchEvent(new PopStateEvent("popstate"));
-          return;
-        }
-
-        setMessage(
-          "Kontoen er opprettet. Bekreft e-posten før du logger inn.",
-          "success"
-        );
-      } else {
-        await signInWithPassword(
-          formData.get("email"),
-          formData.get("password")
-        );
-
-        window.history.replaceState({}, "", "/tips");
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      }
-    } catch (error) {
-      setMessage(error.message, "error");
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = mode === "signup"
-        ? "Opprett konto"
-        : "Logg inn";
-    }
+  toggleButton?.addEventListener("click", () => {
+    mode = mode === "login" ? "signup" : "login";
+    updateMode();
   });
 
   forgotButton?.addEventListener("click", async () => {
@@ -223,22 +155,51 @@ function bindLoginPage() {
     }
   });
 
-  magicButton?.addEventListener("click", async () => {
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const submitButton = form.querySelector('button[type="submit"]');
     const formData = new FormData(form);
-    magicButton.disabled = true;
-    magicButton.textContent = "Sender …";
+
+    submitButton.disabled = true;
+    submitButton.textContent = mode === "signup"
+      ? "Oppretter …"
+      : "Logger inn …";
+    setMessage("");
 
     try {
-      await sendMagicLink(
-        formData.get("email"),
-        formData.get("displayName")
-      );
-      setMessage("Innloggingslenken er sendt.", "success");
+      if (mode === "signup") {
+        const result = await signUpWithPassword(
+          formData.get("email"),
+          formData.get("password"),
+          formData.get("displayName")
+        );
+
+        if (!result.session) {
+          setMessage(
+            "Kontoen er opprettet. Du kan nå logge inn.",
+            "success"
+          );
+          mode = "login";
+          updateMode();
+          return;
+        }
+      } else {
+        await signInWithPassword(
+          formData.get("email"),
+          formData.get("password")
+        );
+      }
+
+      window.history.replaceState({}, "", "/tips");
+      window.dispatchEvent(new PopStateEvent("popstate"));
     } catch (error) {
       setMessage(error.message, "error");
     } finally {
-      magicButton.disabled = false;
-      magicButton.textContent = "Send innloggingslenke på e-post";
+      submitButton.disabled = false;
+      submitButton.textContent = mode === "signup"
+        ? "Opprett konto"
+        : "Logg inn";
     }
   });
 }
