@@ -22,13 +22,13 @@ export function MatchCard(match) {
       <div class="match-card__teams">
         <div>
           ${Tier({ tier: match.home_tier })}
-          <span class="team-name-with-flag"><span class="team-flag">${countryCodeToFlag(match.home_country_code)}</span><strong>${match.home_team}</strong></span>
+          <strong>${countryCodeToFlag(match.home_country_code)} ${match.home_team}</strong>
         </div>
 
         <span>–</span>
 
         <div>
-          <span class="team-name-with-flag"><strong>${match.away_team}</strong><span class="team-flag">${countryCodeToFlag(match.away_country_code)}</span></span>
+          <strong>${match.away_team} ${countryCodeToFlag(match.away_country_code)}</strong>
           ${Tier({ tier: match.away_tier })}
         </div>
       </div>
