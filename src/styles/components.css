@@ -691,3 +691,17 @@
     text-align: center;
   }
 }
+
+/* Patch 021: consistent emoji flags */
+.team-name-with-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-width: 0;
+}
+.team-flag {
+  display: inline-block;
+  flex: 0 0 auto;
+  font-size: 1.35em;
+  line-height: 1;
+}

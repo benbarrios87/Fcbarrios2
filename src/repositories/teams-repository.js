@@ -1,5 +1,18 @@
 import { supabase } from "../services/supabase-client.js";
 
+
+export async function getTournamentTeams(tournamentId) {
+  const { data, error } = await supabase
+    .from("teams")
+    .select("id,code,name,short_name,tier,country_code,group_name,is_active")
+    .eq("tournament_id", tournamentId)
+    .eq("is_active", true)
+    .order("name");
+
+  if (error) throw new Error(`Kunne ikke hente lagene: ${error.message}`);
+  return data ?? [];
+}
+
 export async function getAdminTeams(tournamentId) {
   const { data, error } = await supabase.rpc("get_admin_teams", {
     target_tournament_id: tournamentId

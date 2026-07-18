@@ -43,8 +43,12 @@ export async function getMatchesForRound(tournamentId, roundId) {
       external_id,
       round,
       match_order,
+      home_team_id,
+      away_team_id,
       home_team,
       away_team,
+      home:teams!matches_home_team_id_fkey(country_code),
+      away:teams!matches_away_team_id_fkey(country_code),
       home_tier,
       away_tier,
       kickoff_at,
@@ -62,5 +66,9 @@ export async function getMatchesForRound(tournamentId, roundId) {
   const { data, error } = await query;
 
   if (error) throw new Error(`Kunne ikke hente kampene: ${error.message}`);
-  return data ?? [];
+  return (data ?? []).map((match) => ({
+    ...match,
+    home_country_code: match.home?.country_code || "",
+    away_country_code: match.away?.country_code || ""
+  }));
 }

@@ -125,7 +125,8 @@ export async function getHomeData(tournamentId) {
   ] = await Promise.all([
     supabase.from("leaderboard_view").select("*").eq("tournament_id", tournamentId).order("rank").limit(5),
     supabase.from("matches").select(`
-      id,tournament_id,round_id,round,match_order,home_team,away_team,
+      id,tournament_id,round_id,round,match_order,home_team_id,away_team_id,home_team,away_team,
+      home:teams!matches_home_team_id_fkey(country_code),away:teams!matches_away_team_id_fkey(country_code),
       home_tier,away_tier,kickoff_at,tipping_closes_at,status
     `).eq("tournament_id", tournamentId).in("status", ["scheduled", "live"]).order("kickoff_at").limit(4),
     supabase.from("announcements").select("*").eq("tournament_id", tournamentId).eq("is_published", true).order("published_at", { ascending: false }).limit(4),
@@ -142,7 +143,14 @@ export async function getHomeData(tournamentId) {
 
   return {
     leaderboard: leaderboardResult.data ?? [],
-    matches: mergeMatchesAndPredictions(matchesResult.data ?? [], predictions),
+    matches: mergeMatchesAndPredictions(
+      (matchesResult.data ?? []).map((match) => ({
+        ...match,
+        home_country_code: match.home?.country_code || "",
+        away_country_code: match.away?.country_code || ""
+      })),
+      predictions
+    ),
     news: (newsResult.data ?? []).map((item) => ({
       id: item.id,
       icon: item.icon || "📣",

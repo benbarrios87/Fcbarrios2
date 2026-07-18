@@ -1,4 +1,5 @@
 import { formatKickoff } from "../../utils/format.js";
+import { countryCodeToFlag } from "../../utils/flag.js";
 
 function Tier({ tier }) {
   return `<span class="tier tier--${tier}">T${tier}</span>`;
@@ -21,13 +22,13 @@ export function MatchCard(match) {
       <div class="match-card__teams">
         <div>
           ${Tier({ tier: match.home_tier })}
-          <strong>${match.home_team}</strong>
+          <span class="team-name-with-flag"><span class="team-flag">${countryCodeToFlag(match.home_country_code)}</span><strong>${match.home_team}</strong></span>
         </div>
 
         <span>–</span>
 
         <div>
-          <strong>${match.away_team}</strong>
+          <span class="team-name-with-flag"><strong>${match.away_team}</strong><span class="team-flag">${countryCodeToFlag(match.away_country_code)}</span></span>
           ${Tier({ tier: match.away_tier })}
         </div>
       </div>

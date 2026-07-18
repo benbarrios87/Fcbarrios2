@@ -134,6 +134,7 @@ function bindEvents() {
   const preview = form?.querySelector("[data-flag-preview]");
 
   countryInput?.addEventListener("input", () => {
+    countryInput.value = countryInput.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2);
     preview.textContent = countryCodeToFlag(countryInput.value);
   });
 

@@ -23,6 +23,8 @@ export async function getCommunityPredictions(tournamentId, limit = 4) {
     id: item.match_id,
     home_team: item.home_team,
     away_team: item.away_team,
+    home_country_code: item.home_country_code || "",
+    away_country_code: item.away_country_code || "",
     kickoff_at: item.kickoff_at,
     home_pct: Number(item.home_pct || 0),
     draw_pct: Number(item.draw_pct || 0),

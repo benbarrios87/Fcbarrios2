@@ -1,5 +1,7 @@
 import { getAuthSnapshot } from "../../services/auth-service.js";
 import { getActiveTournament } from "../../repositories/tournament-repository.js";
+import { getTournamentTeams } from "../../repositories/teams-repository.js";
+import { countryCodeToFlag } from "../../utils/flag.js";
 import {
   getBonusGames,
   getMyBonusEntries,
@@ -9,6 +11,7 @@ import {
 let state = {
   tournament: null,
   games: [],
+  teamsById: new Map(),
   entries: new Map()
 };
 
@@ -30,12 +33,18 @@ function remainingBudget(game) {
 
 function renderCandidate(game, candidate) {
   const stake = currentStake(game.id, candidate.id);
+  const team = candidate.candidate_type === "team"
+    ? state.teamsById.get(candidate.reference_id)
+    : null;
+  const label = team
+    ? `${countryCodeToFlag(team.country_code)} ${candidate.label}`
+    : candidate.label;
 
   if (game.game_type === "allocation") {
     return `
       <label class="bonus-candidate">
         <div>
-          <strong>${candidate.label}</strong>
+          <strong>${label}</strong>
           <small>
             ${candidate.tier ? `Tier ${candidate.tier} · ` : ""}
             ×${Number(candidate.multiplier).toLocaleString("no-NO")}
@@ -59,7 +68,7 @@ function renderCandidate(game, candidate) {
   return `
     <label class="bonus-candidate bonus-candidate--check">
       <div>
-        <strong>${candidate.label}</strong>
+        <strong>${label}</strong>
         <small>
           ${candidate.tier ? `Tier ${candidate.tier}` : ""}
         </small>
@@ -223,14 +232,16 @@ export async function BonusPage() {
   }
 
   const tournament = await getActiveTournament();
-  const [games, savedEntries] = await Promise.all([
+  const [games, savedEntries, teams] = await Promise.all([
     getBonusGames(tournament.id),
-    getMyBonusEntries(tournament.id)
+    getMyBonusEntries(tournament.id),
+    getTournamentTeams(tournament.id)
   ]);
 
   state = {
     tournament,
     games,
+    teamsById: new Map(teams.map((team) => [team.id, team])),
     entries: new Map(
       savedEntries.map((entry) => [
         entryKey(entry.bonus_game_id, entry.candidate_id),

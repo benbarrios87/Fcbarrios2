@@ -1,4 +1,5 @@
 import { SectionHeading } from "../ui/section-heading.js";
+import { countryCodeToFlag } from "../../utils/flag.js";
 
 function bar(label, value, type = "") {
   return `
@@ -16,7 +17,7 @@ function hiddenCard(row) {
   return `
     <article class="community-card community-card--locked">
       <div class="community-card__title">
-        <strong>${row.home_team} – ${row.away_team}</strong>
+        <strong>${countryCodeToFlag(row.home_country_code)} ${row.home_team} – ${row.away_team} ${countryCodeToFlag(row.away_country_code)}</strong>
         <span>🔒 Skjult</span>
       </div>
 
@@ -31,7 +32,7 @@ function visibleCard(row) {
   return `
     <article class="community-card">
       <div class="community-card__title">
-        <strong>${row.home_team} – ${row.away_team}</strong>
+        <strong>${countryCodeToFlag(row.home_country_code)} ${row.home_team} – ${row.away_team} ${countryCodeToFlag(row.away_country_code)}</strong>
         <span>
           ${
             row.common_score
