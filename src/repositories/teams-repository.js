@@ -1,5 +1,39 @@
 import { supabase } from "../services/supabase-client.js";
 
+/**
+ * Public team list used by tips/bonus pages.
+ * Kept separate from getAdminTeams because get_admin_teams requires admin access.
+ */
+export async function getTournamentTeams(tournamentId, { activeOnly = true } = {}) {
+  let query = supabase
+    .from("teams")
+    .select(`
+      id,
+      tournament_id,
+      code,
+      name,
+      short_name,
+      tier,
+      country_code,
+      group_name,
+      is_active,
+      rtg_multiplier,
+      competition_status
+    `)
+    .eq("tournament_id", tournamentId)
+    .order("group_name", { ascending: true, nullsFirst: false })
+    .order("name", { ascending: true });
+
+  if (activeOnly) {
+    query = query.eq("is_active", true);
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw new Error(`Kunne ikke hente lagene: ${error.message}`);
+  return data ?? [];
+}
+
 export async function getAdminTeams(tournamentId) {
   const { data, error } = await supabase.rpc("get_admin_teams", {
     target_tournament_id: tournamentId
