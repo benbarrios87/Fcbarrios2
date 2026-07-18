@@ -542,3 +542,66 @@ body {
     min-width: 0;
   }
 }
+
+/* Patch 024: Team mission control */
+.admin-team-form__status-field {
+  grid-column: span 2;
+}
+
+.admin-team-row {
+  grid-template-columns: 45px minmax(140px, 1fr) minmax(230px, auto) auto auto;
+}
+
+.admin-team-row__meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-team-row__multiplier,
+.admin-team-row__status {
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.admin-team-row__multiplier {
+  color: var(--green-light);
+  background: rgba(41,209,125,.1);
+}
+
+.admin-team-row__status {
+  color: var(--text);
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.035);
+}
+
+@media (max-width: 900px) {
+  .admin-team-row {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+  }
+
+  .admin-team-row__meta {
+    grid-column: 2 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-team-form__status-field {
+    grid-column: auto;
+  }
+
+  .admin-team-row {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .admin-team-row__meta {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}

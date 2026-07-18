@@ -13,11 +13,45 @@ let state = {
   editingId: null
 };
 
+const teamStatuses = [
+  ["not_started", "Ikke startet"],
+  ["group", "Gruppespill"],
+  ["round32", "32-delsfinale"],
+  ["round16", "Åttedelsfinale"],
+  ["quarterfinal", "Kvartfinale"],
+  ["semifinal", "Semifinale"],
+  ["bronze_match", "Spiller bronsefinale"],
+  ["bronze_winner", "Bronsevinner"],
+  ["finalist", "Finalist"],
+  ["champion", "Mester"],
+  ["eliminated_group", "Utslått i gruppespill"],
+  ["eliminated_round32", "Utslått i 32-delsfinale"],
+  ["eliminated_round16", "Utslått i åttedelsfinale"],
+  ["eliminated_quarterfinal", "Utslått i kvartfinale"],
+  ["eliminated_semifinal", "Utslått i semifinale"],
+  ["runner_up", "Tapende finalist"]
+];
+
+const statusMap = new Map(teamStatuses);
+
 function formValues(form) {
   return Object.fromEntries(new FormData(form).entries());
 }
 
+function statusIcon(status) {
+  if (status === "champion") return "🏆";
+  if (status === "bronze_winner") return "🥉";
+  if (status === "finalist" || status === "runner_up") return "🥈";
+  if (status === "bronze_match") return "🟠";
+  if (String(status || "").startsWith("eliminated_")) return "⚫";
+  if (status === "not_started") return "⚪";
+  return "🟢";
+}
+
 function teamRow(team) {
+  const status = team.competition_status || "not_started";
+  const multiplier = Number(team.rtg_multiplier || 1);
+
   return `
     <article class="admin-team-row ${team.is_active ? "" : "is-inactive"}" data-team-id="${team.id}">
       <span class="admin-team-row__flag">${countryCodeToFlag(team.country_code)}</span>
@@ -27,7 +61,11 @@ function teamRow(team) {
         <small>${team.code}${team.group_name ? ` · Gruppe ${team.group_name}` : ""}</small>
       </div>
 
-      <span class="admin-team-row__tier">Tier ${team.tier}</span>
+      <div class="admin-team-row__meta">
+        <span class="admin-team-row__tier">Tier ${team.tier}</span>
+        <span class="admin-team-row__multiplier">RTG ×${multiplier.toLocaleString("no-NO", { maximumFractionDigits: 3 })}</span>
+        <span class="admin-team-row__status">${statusIcon(status)} ${statusMap.get(status) || status}</span>
+      </div>
 
       <button type="button" class="button button--ghost" data-edit-team>
         Rediger
@@ -45,6 +83,7 @@ function render() {
   if (!target) return;
 
   const editing = state.teams.find((team) => team.id === state.editingId);
+  const currentStatus = editing?.competition_status || "not_started";
 
   target.innerHTML = `
     <section class="panel admin-team-editor">
@@ -77,7 +116,7 @@ function render() {
             <input name="countryCode" maxlength="2" value="${editing?.country_code || ""}" placeholder="NO" />
             <b data-flag-preview>${countryCodeToFlag(editing?.country_code)}</b>
           </div>
-          <small>To bokstaver. NO gir 🇳🇴. Ingen bildefiler.</small>
+          <small>To bokstaver, for eksempel NO.</small>
         </label>
 
         <label>
@@ -94,6 +133,31 @@ function render() {
         <label>
           <span>Gruppe</span>
           <input name="groupName" value="${editing?.group_name || ""}" placeholder="A" />
+        </label>
+
+        <label>
+          <span>RTG-multiplikator</span>
+          <input
+            name="rtgMultiplier"
+            type="number"
+            min="0"
+            step="0.001"
+            value="${editing?.rtg_multiplier ?? 1}"
+            placeholder="1.000"
+          />
+          <small>Synkroniseres med lagets RTG-kandidat.</small>
+        </label>
+
+        <label class="admin-team-form__status-field">
+          <span>Turneringsstatus</span>
+          <select name="competitionStatus">
+            ${teamStatuses.map(([value, label]) => `
+              <option value="${value}" ${currentStatus === value ? "selected" : ""}>
+                ${statusIcon(value)} ${label}
+              </option>
+            `).join("")}
+          </select>
+          <small>Brukes for å holde styr på hvem som er videre eller utslått.</small>
         </label>
 
         <div class="admin-team-form__actions">
@@ -138,6 +202,10 @@ function bindEvents() {
     preview.textContent = countryCodeToFlag(countryInput.value);
   });
 
+  form?.elements.code?.addEventListener("input", () => {
+    form.elements.code.value = form.elements.code.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 3);
+  });
+
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const values = formValues(form);
@@ -145,6 +213,7 @@ function bindEvents() {
     const submit = form.querySelector("[type=submit]");
 
     submit.disabled = true;
+    message.className = "admin-inline-message";
     message.textContent = "Lagrer …";
 
     try {
@@ -156,7 +225,9 @@ function bindEvents() {
         shortName: values.shortName,
         tier: values.tier,
         countryCode: values.countryCode,
-        groupName: values.groupName
+        groupName: values.groupName,
+        rtgMultiplier: values.rtgMultiplier,
+        competitionStatus: values.competitionStatus
       });
 
       state.editingId = null;
@@ -227,8 +298,8 @@ export async function TeamsPage() {
     <div class="page">
       <header class="page-header">
         <span>Admin · ${tournament.short_name}</span>
-        <h1>Lag og flagg</h1>
-        <p>Legg inn landskode én gang. Flagget lages automatisk som emoji.</p>
+        <h1>Lagkontroll</h1>
+        <p>Administrer tier, gruppe, RTG-multiplikator og turneringsstatus på ett sted.</p>
       </header>
       <section id="teams-content"></section>
     </div>
