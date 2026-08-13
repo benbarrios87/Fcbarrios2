@@ -15,6 +15,7 @@ import { TournamentPage } from "../pages/admin/tournament-page.js";
 import { TeamsPage } from "../pages/admin/teams-page.js";
 import { HistoryPage } from "../pages/history/history-page.js";
 import { ClubSelectPage } from "../pages/club-select/club-select-page.js";
+import { ClubTipsPage } from "../pages/club-tips/club-tips-page.js";
 import { LoginPage } from "../pages/login/login-page.js";
 import { ResetPasswordPage } from "../pages/login/reset-password-page.js";
 import { AuthCallbackPage } from "../pages/auth-callback/auth-callback-page.js";
@@ -32,6 +33,7 @@ export const routes={
   "/stats":StatsPage,
   "/history":HistoryPage,
   "/know-your-club":ClubSelectPage,
+  "/know-your-club/tips":ClubTipsPage,
   "/admin":AdminPage,
   "/admin/results":ResultsPage,
   "/admin/scoring":ScoreModelPage,

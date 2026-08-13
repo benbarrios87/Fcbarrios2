@@ -234,3 +234,29 @@ export const mockKnowYourClubTeams = [
 ];
 
 export const mockClubSelection = null;
+
+export const mockKnowYourClubScoreConfig = {
+  outcome_bands: [
+    { max_odds: 1.5, points: 1 },
+    { max_odds: 2.2, points: 2 },
+    { max_odds: 3.5, points: 3 },
+    { max_odds: 6.0, points: 4 },
+    { max_odds: null, points: 5 }
+  ],
+  difference_bonus: 2,
+  exact_bonus: 3
+};
+
+export const mockClubMatch = {
+  id: "mock-kyc-match-1",
+  tournament_id: "kyc-2026-mock",
+  home_team_id: "t-ars",
+  away_team_id: "t-avl",
+  home_team: "Arsenal",
+  away_team: "Aston Villa",
+  kickoff_at: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString(),
+  home_score: null,
+  away_score: null,
+  status: "scheduled",
+  odds: { home_odds: 1.45, draw_odds: 4.5, away_odds: 6.8 }
+};

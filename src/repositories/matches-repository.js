@@ -1,5 +1,5 @@
 import { supabase, hasSupabaseConfig } from "../services/supabase-client.js";
-import { mockMatches } from "../data/mock-data.js";
+import { mockMatches, mockClubMatch } from "../data/mock-data.js";
 
 function normalizeTeamName(value) {
   return String(value || "")
@@ -111,4 +111,59 @@ export async function getMatchesForRound(tournamentId, roundId) {
   if (teamsError) return matches ?? [];
 
   return enrichMatchesWithCountryCodes(matches ?? [], teams ?? []);
+}
+
+/**
+ * Henter spillerens neste kamp for et gitt lag i en turnering
+ * (Know Your Club: laget spilleren har valgt). Kun kommende/planlagte
+ * kamper (ikke ferdigspilte).
+ */
+export async function getNextTeamMatch(tournamentId, teamId) {
+  if (!hasSupabaseConfig) return mockClubMatch;
+
+  const { data, error } = await supabase
+    .from("matches")
+    .select(`
+      id,
+      tournament_id,
+      round_id,
+      external_id,
+      round,
+      home_team_id,
+      away_team_id,
+      home_team,
+      away_team,
+      kickoff_at,
+      tipping_opens_at,
+      tipping_closes_at,
+      home_score,
+      away_score,
+      status
+    `)
+    .eq("tournament_id", tournamentId)
+    .or(`home_team_id.eq.${teamId},away_team_id.eq.${teamId}`)
+    .order("kickoff_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error(`Kunne ikke hente kampen: ${error.message}`);
+  return data;
+}
+
+/**
+ * Henter det låste odds-snapshotet (is_scoring_snapshot = true) for
+ * en kamp, brukt til å vise poengverdien av hvert utfall før tipsfrist.
+ */
+export async function getMatchScoringOdds(matchId) {
+  if (!hasSupabaseConfig) return mockClubMatch.odds;
+
+  const { data, error } = await supabase
+    .from("match_odds")
+    .select("home_odds, draw_odds, away_odds")
+    .eq("match_id", matchId)
+    .eq("is_scoring_snapshot", true)
+    .maybeSingle();
+
+  if (error) throw new Error(`Kunne ikke hente oddsen: ${error.message}`);
+  return data;
 }

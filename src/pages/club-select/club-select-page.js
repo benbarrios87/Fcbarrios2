@@ -109,9 +109,18 @@ function bindEvents() {
         state.tournament.id,
         state.selectedTeamId
       );
-     state.lockedAt = saved?.locked_at ?? null;
+      state.lockedAt = saved?.locked_at ?? null;
       renderContent();
       setMessage("Klubbvalget er lagret.", "success");
+      const message = document.querySelector("[data-club-message]");
+      if (message) {
+        message.insertAdjacentHTML(
+          "afterend",
+          `<a class="button button--ghost button--full club-next-match-link" href="/know-your-club/tips" data-link>
+            Se din neste kamp →
+          </a>`
+        );
+      }
     } catch (error) {
       setMessage(error.message, "error");
       saveButton.disabled = false;
