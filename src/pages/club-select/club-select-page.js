@@ -109,9 +109,9 @@ function bindEvents() {
         state.tournament.id,
         state.selectedTeamId
       );
-      state.lockedAt = saved?.locked_at ?? null;
-      setMessage("Klubbvalget er lagret.", "success");
+     state.lockedAt = saved?.locked_at ?? null;
       renderContent();
+      setMessage("Klubbvalget er lagret.", "success");
     } catch (error) {
       setMessage(error.message, "error");
       saveButton.disabled = false;
