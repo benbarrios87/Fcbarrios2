@@ -198,3 +198,39 @@ export const mockProfile = {
     { tournament: "VM 2022", rank: 1, points: 121.5 }
   ]
 };
+
+// --- Know Your Club (Patch 027 — mock/preview) ---------------------
+
+export const mockKnowYourClubTournament = {
+  id: "kyc-2026-mock",
+  slug: "know-your-club-2026",
+  name: "Know Your Club 2026/27",
+  short_name: "KYC 26/27",
+  status: "planning",
+  settings: { format: "club_challenge" }
+};
+
+export const mockKnowYourClubTeams = [
+  { id: "t-ars", code: "ARS", name: "Arsenal", short_name: "Arsenal", country_code: "GB-ENG" },
+  { id: "t-avl", code: "AVL", name: "Aston Villa", short_name: "Aston Villa", country_code: "GB-ENG" },
+  { id: "t-bou", code: "BOU", name: "AFC Bournemouth", short_name: "Bournemouth", country_code: "GB-ENG" },
+  { id: "t-bre", code: "BRE", name: "Brentford", short_name: "Brentford", country_code: "GB-ENG" },
+  { id: "t-bha", code: "BHA", name: "Brighton & Hove Albion", short_name: "Brighton", country_code: "GB-ENG" },
+  { id: "t-che", code: "CHE", name: "Chelsea", short_name: "Chelsea", country_code: "GB-ENG" },
+  { id: "t-cov", code: "COV", name: "Coventry City", short_name: "Coventry", country_code: "GB-ENG" },
+  { id: "t-cry", code: "CRY", name: "Crystal Palace", short_name: "Crystal Palace", country_code: "GB-ENG" },
+  { id: "t-eve", code: "EVE", name: "Everton", short_name: "Everton", country_code: "GB-ENG" },
+  { id: "t-ful", code: "FUL", name: "Fulham", short_name: "Fulham", country_code: "GB-ENG" },
+  { id: "t-hul", code: "HUL", name: "Hull City", short_name: "Hull", country_code: "GB-ENG" },
+  { id: "t-ips", code: "IPS", name: "Ipswich Town", short_name: "Ipswich", country_code: "GB-ENG" },
+  { id: "t-lee", code: "LEE", name: "Leeds United", short_name: "Leeds", country_code: "GB-ENG" },
+  { id: "t-liv", code: "LIV", name: "Liverpool", short_name: "Liverpool", country_code: "GB-ENG" },
+  { id: "t-mci", code: "MCI", name: "Manchester City", short_name: "Man City", country_code: "GB-ENG" },
+  { id: "t-mun", code: "MUN", name: "Manchester United", short_name: "Man United", country_code: "GB-ENG" },
+  { id: "t-new", code: "NEW", name: "Newcastle United", short_name: "Newcastle", country_code: "GB-ENG" },
+  { id: "t-nfo", code: "NFO", name: "Nottingham Forest", short_name: "Nottm Forest", country_code: "GB-ENG" },
+  { id: "t-sun", code: "SUN", name: "Sunderland", short_name: "Sunderland", country_code: "GB-ENG" },
+  { id: "t-tot", code: "TOT", name: "Tottenham Hotspur", short_name: "Tottenham", country_code: "GB-ENG" }
+];
+
+export const mockClubSelection = null;

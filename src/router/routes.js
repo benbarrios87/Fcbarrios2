@@ -14,6 +14,7 @@ import { PrizesPage } from "../pages/admin/prizes-page.js";
 import { TournamentPage } from "../pages/admin/tournament-page.js";
 import { TeamsPage } from "../pages/admin/teams-page.js";
 import { HistoryPage } from "../pages/history/history-page.js";
+import { ClubSelectPage } from "../pages/club-select/club-select-page.js";
 import { LoginPage } from "../pages/login/login-page.js";
 import { ResetPasswordPage } from "../pages/login/reset-password-page.js";
 import { AuthCallbackPage } from "../pages/auth-callback/auth-callback-page.js";
@@ -30,6 +31,7 @@ export const routes={
   "/profile/edit":EditProfilePage,
   "/stats":StatsPage,
   "/history":HistoryPage,
+  "/know-your-club":ClubSelectPage,
   "/admin":AdminPage,
   "/admin/results":ResultsPage,
   "/admin/scoring":ScoreModelPage,
