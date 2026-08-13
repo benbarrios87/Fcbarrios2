@@ -1,3 +1,105 @@
+/* Know Your Club — hero + klubbvalg (Patch 027, redesignet) */
+
+.kyc-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(200px, .65fr);
+  align-items: center;
+  gap: 20px;
+  min-height: 300px;
+  margin-bottom: 20px;
+  padding: clamp(24px, 4vw, 44px);
+  overflow: hidden;
+  border: 1px solid var(--line-gold);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(120deg, rgba(6, 15, 27, .98) 25%, rgba(10, 28, 42, .85)),
+    radial-gradient(circle at 85% 15%, rgba(245, 200, 91, .22), transparent 42%);
+  box-shadow: var(--shadow);
+}
+
+.kyc-hero h1 {
+  max-width: 480px;
+  margin: 14px 0 12px;
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  line-height: .96;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+}
+
+.kyc-hero h1 em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.kyc-hero p {
+  max-width: 460px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.kyc-hero__visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-height: 170px;
+  text-align: center;
+}
+
+.kyc-hero__orb {
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #EF0107, #670E36, #0057B8, #034694, #1B458F,
+    #C8102E, #6CABDD, #132257, #DD0000, #EF0107
+  );
+  filter: blur(26px) saturate(1.4);
+  opacity: .55;
+}
+
+.kyc-hero__visual span {
+  position: relative;
+  font-size: 54px;
+  font-weight: 950;
+  letter-spacing: -.03em;
+  color: var(--text);
+}
+
+.kyc-hero__visual small {
+  position: relative;
+  color: var(--gold-light);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Klubb-badge (fargesirkel med initialer, ingen logoer) */
+
+.club-badge {
+  display: inline-grid;
+  place-items: center;
+  width: var(--club-badge-size, 40px);
+  height: var(--club-badge-size, 40px);
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--club-badge-text, #fff);
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.35), transparent 55%),
+    var(--club-badge-color, #2C3E50);
+  font-weight: 900;
+  font-size: calc(var(--club-badge-size, 40px) * .34);
+  letter-spacing: -.02em;
+  box-shadow: 0 6px 16px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+/* Klubbrutenett */
+
 .club-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -6,15 +108,21 @@
 }
 
 .club-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px;
+  gap: 12px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 15px;
+  border-radius: var(--radius-sm);
   background: var(--surface-soft);
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+
+.club-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-gold);
 }
 
 .club-card input {
@@ -23,34 +131,53 @@
   pointer-events: none;
 }
 
-.club-card__flag {
-  font-size: 20px;
-}
-
 .club-card__name {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
   color: var(--text);
 }
 
+.club-card__check {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  color: var(--gold);
+  font-weight: 900;
+  font-size: 13px;
+}
+
 .club-card--selected {
   border-color: var(--gold);
-  background: rgba(245, 200, 91, 0.1);
+  background:
+    linear-gradient(120deg, rgba(245, 200, 91, .12), rgba(245, 200, 91, .04));
+  box-shadow: 0 0 0 1px var(--gold) inset;
 }
 
 .club-card--locked {
-  opacity: 0.6;
+  opacity: .55;
   cursor: default;
+  transform: none;
 }
 
 .club-select-locked {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 14px;
-  padding: 12px 14px;
+  padding: 12px 16px;
   border: 1px solid var(--line-gold);
-  border-radius: 12px;
-  background: rgba(245, 200, 91, 0.08);
+  border-radius: var(--radius-sm);
+  background: rgba(245, 200, 91, .08);
   color: var(--gold-light);
   font-size: 13px;
+}
+
+.club-select-locked strong {
+  color: var(--text);
+}
+
+.club-next-match-link {
+  margin-top: 10px;
 }
 
 .club-select-message {
@@ -66,4 +193,14 @@
 
 .club-select-message--error {
   color: var(--red);
+}
+
+@media (max-width: 640px) {
+  .kyc-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .kyc-hero__visual {
+    min-height: 110px;
+  }
 }

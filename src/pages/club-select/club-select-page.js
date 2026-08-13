@@ -6,10 +6,8 @@ import {
   getMyClubSelection,
   saveClubSelection
 } from "../../repositories/club-selection-repository.js";
-import { countryCodeToFlag } from "../../utils/flag.js";
-import {
-  mockKnowYourClubTeams
-} from "../../data/mock-data.js";
+import { ClubBadge } from "../../utils/club-badge.js";
+import { mockKnowYourClubTeams } from "../../data/mock-data.js";
 
 const TOURNAMENT_SLUG = "know-your-club-2026";
 
@@ -34,10 +32,15 @@ function renderTeamCard(team) {
         ${isSelected ? "checked" : ""}
         ${isLocked ? "disabled" : ""}
       />
-      <span class="club-card__flag">${countryCodeToFlag(team.country_code)}</span>
+      ${ClubBadge(team, 40)}
       <span class="club-card__name">${team.short_name || team.name}</span>
+      ${isSelected ? `<span class="club-card__check">✓</span>` : ""}
     </label>
   `;
+}
+
+function selectedTeam() {
+  return state.teams.find((team) => team.id === state.selectedTeamId) ?? null;
 }
 
 function renderContent() {
@@ -45,16 +48,15 @@ function renderContent() {
   if (!target) return;
 
   const isLocked = Boolean(state.lockedAt);
+  const team = selectedTeam();
 
   target.innerHTML = `
     ${
-      isLocked
+      isLocked && team
         ? `
           <div class="club-select-locked">
-            Lagvalget ditt er låst. Du følger nå ${
-              state.teams.find((team) => team.id === state.selectedTeamId)
-                ?.name ?? "et lag"
-            } gjennom hele konkurransen.
+            ${ClubBadge(team, 30)}
+            <span>Lagvalget ditt er låst — du følger <strong>${team.name}</strong> gjennom hele konkurransen.</span>
           </div>
         `
         : ""
@@ -70,7 +72,7 @@ function renderContent() {
       data-save-club
       ${state.selectedTeamId && !isLocked ? "" : "disabled"}
     >
-      ${state.selectedTeamId ? "Bekreft klubbvalg" : "Velg et lag først"}
+      ${state.selectedTeamId ? `Bekreft ${team?.short_name ?? ""}` : "Velg et lag først"}
     </button>
 
     <div class="club-select-message" data-club-message></div>
@@ -112,6 +114,7 @@ function bindEvents() {
       state.lockedAt = saved?.locked_at ?? null;
       renderContent();
       setMessage("Klubbvalget er lagret.", "success");
+
       const message = document.querySelector("[data-club-message]");
       if (message) {
         message.insertAdjacentHTML(
@@ -166,15 +169,22 @@ export async function ClubSelectPage() {
 
   return `
     <div class="page">
-      <header class="page-header">
-        <span>${tournament.short_name}</span>
-        <h1>Velg din klubb</h1>
-        <p>
-          Hvem heier du på i Premier League? Du tipper kun kampene til
-          laget du velger her — én kamp i uka, resten av sesongen.
-          Dette er en forhåndsvisning: konkurransen er ikke i gang ennå.
-        </p>
-      </header>
+      <section class="kyc-hero">
+        <div class="kyc-hero__copy">
+          <span class="eyebrow"><i></i>${tournament.short_name} · Forhåndsvisning</span>
+          <h1>Hvor godt<br/>kjenner du <em>ditt</em> lag?</h1>
+          <p>
+            Velg favorittklubben din i Premier League. Du tipper kun
+            kampene til laget du velger — én kamp i uka, hele sesongen.
+            Ingen skjuler seg bak et lag de ikke egentlig følger.
+          </p>
+        </div>
+        <div class="kyc-hero__visual">
+          <div class="kyc-hero__orb"></div>
+          <span>20</span>
+          <small>klubber å velge mellom</small>
+        </div>
+      </section>
 
       <section id="club-select-content"></section>
     </div>

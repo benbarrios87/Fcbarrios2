@@ -10,7 +10,8 @@ import {
   getMyPredictions,
   savePrediction
 } from "../../repositories/predictions-repository.js";
-import { mockKnowYourClubScoreConfig } from "../../data/mock-data.js";
+import { mockKnowYourClubScoreConfig, mockKnowYourClubTeams } from "../../data/mock-data.js";
+import { ClubBadge } from "../../utils/club-badge.js";
 
 const TOURNAMENT_SLUG = "know-your-club-2026";
 
@@ -51,6 +52,12 @@ async function getActiveDynamicOddsConfig(tournamentId) {
   return data.config;
 }
 
+function findTeamByName(name) {
+  return mockKnowYourClubTeams.find(
+    (team) => team.name === name || team.short_name === name
+  );
+}
+
 function formatKickoff(iso) {
   if (!iso) return "";
   return new Date(iso).toLocaleString("nb-NO", {
@@ -70,23 +77,23 @@ function renderPreview(config, odds) {
   const awayPts = bandPoints(config, odds.away_odds);
 
   return `
-    <div class="odds-preview">
-      <div class="odds-preview__row">
+    <div class="odds-strip">
+      <article>
         <span>Hjemmeseier</span>
-        <strong>${homePts ?? "–"}p</strong>
-      </div>
-      <div class="odds-preview__row">
+        <strong>${homePts ?? "–"}<small>p</small></strong>
+      </article>
+      <article>
         <span>Uavgjort</span>
-        <strong>${drawPts ?? "–"}p</strong>
-      </div>
-      <div class="odds-preview__row">
+        <strong>${drawPts ?? "–"}<small>p</small></strong>
+      </article>
+      <article>
         <span>Borteseier</span>
-        <strong>${awayPts ?? "–"}p</strong>
-      </div>
+        <strong>${awayPts ?? "–"}<small>p</small></strong>
+      </article>
     </div>
-    <p class="odds-preview__bonus">
-      + ${config.difference_bonus ?? 0}p for riktig målforskjell ·
-      + ${config.exact_bonus ?? 0}p for eksakt resultat
+    <p class="odds-strip__bonus">
+      + ${config.difference_bonus ?? 0}p riktig målforskjell &nbsp;·&nbsp;
+      + ${config.exact_bonus ?? 0}p eksakt resultat
     </p>
   `;
 }
@@ -190,13 +197,28 @@ export async function ClubTipsPage() {
 
   window.setTimeout(bindTipForm, 0);
 
+  const homeTeam = findTeamByName(match.home_team) || { name: match.home_team, short_name: match.home_team, code: match.home_team?.slice(0, 3) };
+  const awayTeam = findTeamByName(match.away_team) || { name: match.away_team, short_name: match.away_team, code: match.away_team?.slice(0, 3) };
+
   return `
     <div class="page">
-      <header class="page-header">
-        <span>${tournament.short_name} · Runde ${match.round ?? ""}</span>
-        <h1>${match.home_team} – ${match.away_team}</h1>
-        <p>${formatKickoff(match.kickoff_at)}</p>
-      </header>
+      <section class="club-match-hero">
+        <span class="eyebrow"><i></i>${tournament.short_name} · Runde ${match.round ?? ""}</span>
+
+        <div class="club-match-hero__fixture">
+          <div class="club-match-hero__side">
+            ${ClubBadge(homeTeam, 64)}
+            <strong>${homeTeam.short_name}</strong>
+          </div>
+          <span class="club-match-hero__vs">VS</span>
+          <div class="club-match-hero__side">
+            ${ClubBadge(awayTeam, 64)}
+            <strong>${awayTeam.short_name}</strong>
+          </div>
+        </div>
+
+        <time>${formatKickoff(match.kickoff_at)}</time>
+      </section>
 
       ${renderPreview(config, odds)}
 
@@ -208,13 +230,14 @@ export async function ClubTipsPage() {
             </div>
           `
           : `
-            <form class="tip-form" data-tip-form>
+            <form class="tip-form panel" data-tip-form>
               <div class="tip-form__scores">
                 <input
                   type="number" min="0" max="30" inputmode="numeric"
                   name="home_score" data-tip-home
                   value="${existing?.home_score ?? ""}"
                   aria-label="${match.home_team}"
+                  placeholder="0"
                 />
                 <span>–</span>
                 <input
@@ -222,6 +245,7 @@ export async function ClubTipsPage() {
                   name="away_score" data-tip-away
                   value="${existing?.away_score ?? ""}"
                   aria-label="${match.away_team}"
+                  placeholder="0"
                 />
               </div>
               <button class="button button--primary button--full" type="submit">

@@ -1,40 +1,98 @@
-.club-next-match-link {
-  margin-top: 10px;
-}
+/* Know Your Club — kampside (Patch 029, redesignet) */
 
-.odds-preview {
+.club-match-hero {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.odds-preview__row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 8px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface-soft);
+  justify-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: clamp(22px, 4vw, 34px);
+  border: 1px solid var(--line-gold);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(120deg, rgba(6, 15, 27, .98) 25%, rgba(10, 28, 42, .85)),
+    radial-gradient(circle at 50% 0%, rgba(245, 200, 91, .16), transparent 55%);
+  box-shadow: var(--shadow);
   text-align: center;
 }
 
-.odds-preview__row span {
-  font-size: 11px;
+.club-match-hero__fixture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 5vw, 40px);
+}
+
+.club-match-hero__side {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.club-match-hero__side strong {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+.club-match-hero__vs {
   color: var(--muted);
-}
-
-.odds-preview__row strong {
-  font-size: 18px;
-  color: var(--gold-light);
-}
-
-.odds-preview__bonus {
-  margin: 0 0 18px;
   font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.club-match-hero time {
   color: var(--muted);
+  font-size: 12px;
+}
+
+.odds-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(6, 15, 27, .82);
+  backdrop-filter: blur(14px);
+}
+
+.odds-strip article {
+  display: grid;
+  gap: 5px;
+  padding: 16px 14px;
+  border-right: 1px solid var(--line);
+  text-align: center;
+}
+
+.odds-strip article:last-child {
+  border-right: 0;
+}
+
+.odds-strip span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.odds-strip strong {
+  color: var(--gold-light);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.odds-strip strong small {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .8;
+}
+
+.odds-strip__bonus {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 11px;
   text-align: center;
 }
 
@@ -42,32 +100,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 6px;
 }
 
 .tip-form__scores input {
-  width: 64px;
-  padding: 12px;
+  width: 66px;
+  padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: var(--surface-soft);
   color: var(--text);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 900;
   text-align: center;
+}
+
+.tip-form__scores input:focus {
+  outline: none;
+  border-color: var(--gold);
 }
 
 .tip-form__scores span {
   color: var(--muted);
-  font-weight: 700;
+  font-weight: 900;
 }
 
 .club-match-result {
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: var(--surface-soft);
   text-align: center;
-  font-weight: 700;
+  font-weight: 800;
 }
