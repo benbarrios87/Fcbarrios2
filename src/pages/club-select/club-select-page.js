@@ -119,7 +119,7 @@ function bindEvents() {
       if (message) {
         message.insertAdjacentHTML(
           "afterend",
-          `<a class="button button--ghost button--full club-next-match-link" href="/know-your-club/tips" data-link>
+          `<a class="button button--ghost button--full club-next-match-link" href="/tips" data-link>
             Se din neste kamp →
           </a>`
         );
@@ -132,7 +132,7 @@ function bindEvents() {
   });
 }
 
-export async function ClubSelectPage() {
+export async function ClubSelectPage(preloadedTournament) {
   const auth = getAuthSnapshot();
 
   if (!auth.isAuthenticated) {
@@ -150,7 +150,7 @@ export async function ClubSelectPage() {
     `;
   }
 
-  const tournament = await getTournamentBySlug(TOURNAMENT_SLUG);
+  const tournament = preloadedTournament ?? (await getTournamentBySlug(TOURNAMENT_SLUG));
 
   const teams = hasSupabaseConfig
     ? await getTournamentTeams(tournament.id)

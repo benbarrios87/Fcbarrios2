@@ -137,7 +137,7 @@ function bindTipForm() {
   });
 }
 
-export async function ClubTipsPage() {
+export async function ClubTipsPage(preloadedTournament) {
   const auth = getAuthSnapshot();
 
   if (!auth.isAuthenticated) {
@@ -152,7 +152,7 @@ export async function ClubTipsPage() {
     `;
   }
 
-  const tournament = await getTournamentBySlug(TOURNAMENT_SLUG);
+  const tournament = preloadedTournament ?? (await getTournamentBySlug(TOURNAMENT_SLUG));
   const mySelection = await getMyClubSelection(tournament.id);
 
   if (!mySelection?.team_id) {
@@ -256,7 +256,7 @@ export async function ClubTipsPage() {
           `
       }
 
-      <a class="button button--ghost button--full club-next-match-link" href="/know-your-club/leaderboard" data-link>
+      <a class="button button--ghost button--full club-next-match-link" href="/leaderboard" data-link>
         Se leaderboard →
       </a>
     </div>

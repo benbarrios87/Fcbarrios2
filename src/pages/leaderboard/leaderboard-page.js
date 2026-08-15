@@ -1,6 +1,8 @@
 import { getActiveTournament } from "../../repositories/tournament-repository.js";
 import { getLeaderboard } from "../../repositories/leaderboard-repository.js";
 import { formatPoints, initials } from "../../utils/format.js";
+import { isClubChallenge } from "../../utils/tournament-format.js";
+import { ClubLeaderboardPage } from "../club-leaderboard/club-leaderboard-page.js";
 
 const filters = [
   ["all","Alle"],
@@ -34,6 +36,8 @@ function renderRows(players, filter) {
 
 export async function LeaderboardPage() {
   const tournament = await getActiveTournament();
+  if (isClubChallenge(tournament)) return ClubLeaderboardPage(tournament);
+
   const players = await getLeaderboard(tournament.id);
 
   setTimeout(() => {

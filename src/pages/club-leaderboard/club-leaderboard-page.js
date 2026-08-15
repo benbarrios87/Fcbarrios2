@@ -17,8 +17,8 @@ function renderRow(player, index) {
   `;
 }
 
-export async function ClubLeaderboardPage() {
-  const tournament = await getTournamentBySlug(TOURNAMENT_SLUG);
+export async function ClubLeaderboardPage(preloadedTournament) {
+  const tournament = preloadedTournament ?? (await getTournamentBySlug(TOURNAMENT_SLUG));
   const players = await getLeaderboard(tournament.id);
 
   return `
