@@ -255,6 +255,10 @@ export async function ClubTipsPage() {
             </form>
           `
       }
+
+      <a class="button button--ghost button--full club-next-match-link" href="/know-your-club/leaderboard" data-link>
+        Se leaderboard →
+      </a>
     </div>
   `;
 }

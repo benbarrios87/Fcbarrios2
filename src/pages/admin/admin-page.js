@@ -22,11 +22,12 @@ export async function AdminPage() {
     ["🌍", "Lag og flagg", "Legg til lag, tier, gruppe og automatisk flagg.", "/admin/teams"],
     ["⚽", "Kamper og resultater", "Registrer resultater og beregn poeng.", "/admin/results"],
     ["🧮", "Scoremodell", "Endre kampmatrisen uten kode.", "/admin/scoring"],
-    ["🎯", "Bonusmotor", "Toppscorer, Best Player og RTG.", "/admin/bonuses"],
+    ["🎯", "Bonusmotor", "Toppscorer og Best Player.", "/admin/bonuses"],
     ["💳", "Betalinger", "Bronse, Sølv, Gull og betalingsstatus.", "/admin/payments"],
     ["🏆", "Premiemotor", "Sidepotter, fordeling og live vinnere.", "/admin/prizes"],
-    ["📣", "Nyheter", "Publiser meldinger.", "#"],
-    ["👥", "Spillere", "Deltakere og roller.", "#"]
+    ["📣", "Nyheter", "Publiser meldinger.", "/admin/announcements"],
+    ["👥", "Spillere", "Deltakere og roller.", "/admin/members"],
+    ["🛡️", "Know Your Club", "Medlemmer og klubbvalg-låsing.", "/admin/know-your-club"]
   ];
 
   return `

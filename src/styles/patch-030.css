@@ -98,3 +98,59 @@
     max-width: none;
   }
 }
+
+/* Admin-verktøy: medlemmer, nyheter, checkbox */
+
+.admin-team-form textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.admin-inline-checkbox {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-inline-checkbox input {
+  width: auto !important;
+}
+
+/* Statsrommet — ekte fordeling av poengtyper */
+
+.stats-breakdown {
+  display: grid;
+  gap: 12px;
+}
+
+.stats-breakdown__row {
+  display: grid;
+  grid-template-columns: 90px 1fr 30px;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.stats-breakdown__row span {
+  color: var(--muted);
+}
+
+.stats-breakdown__bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.stats-breakdown__bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.stats-breakdown__row strong {
+  text-align: right;
+  color: var(--text);
+}

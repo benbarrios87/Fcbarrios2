@@ -258,7 +258,7 @@ export async function BonusPage() {
         <span>${tournament.short_name}</span>
         <h1>Bonusspill</h1>
         <p>
-          Fordel poeng på Toppscorer, Best Player og Road to Glory,
+          Fordel poeng på Toppscorer og Best Player,
           og lever de øvrige bonusvalgene.
         </p>
       </header>

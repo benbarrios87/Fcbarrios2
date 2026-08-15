@@ -368,7 +368,8 @@ body {
 }
 
 .admin-team-form input,
-.admin-team-form select {
+.admin-team-form select,
+.admin-team-form textarea {
   width: 100%;
   min-width: 0;
   min-height: 44px;
